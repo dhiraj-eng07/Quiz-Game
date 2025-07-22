@@ -2,183 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quiz Game</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      align-items: center;
-    }
-    .quiz-container {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
-      width: 100%;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #333;
-    }
-    #question {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      color: #444;
-    }
-    #options button {
-      display: block;
-      margin: 0.5rem 0;
-      width: 100%;
-      padding: 0.75rem;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      transition: background 0.3s;
-      cursor: pointer;
-    }
-    #options button:hover {
-      background: #0056b3;
-    }
-    #nextBtn {
-      margin-top: 1rem;
-      width: 100%;
-      padding: 0.7rem;
-      font-size: 1rem;
-      border: none;
-      background: #28a745;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      display: none;
-    }
-    #nextBtn:hover {
-      background: #218838;
-    }
-    .hidden {
-      display: none;
-    }
-    #result {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    #feedback {
-      font-weight: bold;
-      margin-top: 0.75rem;
-      font-size: 1rem;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coder's Quiz Break</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="score-display">Score: <span id="currentScore">0</span></div>
   <div class="quiz-container">
-    <h1>Quiz Game</h1>
+    <h1>✨ Coder's Quiz Break ✨</h1>
     <div id="quiz">
       <div id="question">Loading question...</div>
       <div id="options"></div>
       <div id="feedback"></div>
-      <button id="nextBtn">Next</button>
+      <button id="nextBtn">Next Question ➔</button>
     </div>
     <div id="result" class="hidden">
-      <h2>Your Score: <span id="score"></span></h2>
-      <button onclick="location.reload()">Play Again</button>
+      <h2>Quiz Completed! 🎉</h2>
+      <p>Your Score: <span id="score">0</span> / <span id="totalQuestions">0</span></p>
+      <p id="finalComment"></p>
+      <button id="playAgainBtn">Play Again 🔄</button>
     </div>
   </div>
-  <script>
-    const quizData = [
-      { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "Hot Mail", "How To Make Landingpage", "Hyperlinks and Text Markup Language"], answer: 0 },
-      { question: "What does CSS stand for?", options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style Syntax", "Colorful Style Structure"], answer: 1 },
-      { question: "Inside which HTML element do we put JavaScript?", options: ["<js>", "<scripting>", "<script>", "<javascript>"], answer: 2 },
-      { question: "Which language runs in a web browser?", options: ["Java", "C", "Python", "JavaScript"], answer: 3 },
-      { question: "What year was JavaScript launched?", options: ["1996", "1995", "1994", "None of the above"], answer: 1 },
-      { question: "What does SQL stand for?", options: ["Stylish Question Language", "Stylesheet Query Language", "Structured Query Language", "Statement Query Level"], answer: 2 },
-      { question: "Which company developed the React library?", options: ["Google", "Microsoft", "Facebook", "Apple"], answer: 2 },
-      { question: "What does API stand for?", options: ["Application Programming Interface", "Apple Programming Interface", "Application Processing Integration", "Application Program Interaction"], answer: 0 },
-      { question: "Which is not a programming language?", options: ["HTML", "Python", "Java", "C++"], answer: 0 },
-      { question: "Which CSS property controls the text size?", options: ["font-style", "text-size", "font-size", "text-style"], answer: 2 },
-      { question: "Which HTML tag is used to define an internal style sheet?", options: ["<style>", "<css>", "<script>", "<link>"], answer: 0 },
-      { question: "How do you write 'Hello World' in an alert box?", options: ["msgBox('Hello World');", "alertBox('Hello World');", "msg('Hello World');", "alert('Hello World');"], answer: 3 },
-      { question: "Which keyword is used to declare a JavaScript variable?", options: ["var", "let", "const", "All of the above"], answer: 3 },
-      { question: "How do you call a function named myFunction?", options: ["call myFunction()", "myFunction()", "call function myFunction", "None of the above"], answer: 1 },
-      { question: "What is the correct HTML element for inserting a line break?", options: ["<lb>", "<break>", "<br>", "<line>"], answer: 2 },
-      { question: "How can you make a numbered list?", options: ["<dl>", "<ul>", "<ol>", "<list>"], answer: 2 },
-      { question: "How do you add a comment in a CSS file?", options: ["// this is a comment", "/* this is a comment */", "<!-- this is a comment -->", "** this is a comment **"], answer: 1 },
-      { question: "Which symbol is used for comments in JavaScript?", options: ["//", "<!-- -->", "#", "/* */"], answer: 0 },
-      { question: "What does JSON stand for?", options: ["Java Syntax Object Notation", "JavaScript Object Notation", "Java Source Object Notation", "None of the above"], answer: 1 },
-      { question: "What is the correct way to write a JavaScript array?", options: ["var colors = (1:"red", 2:"green", 3:"blue")", "var colors = ["red", "green", "blue"]", "var colors = "red", "green", "blue"", "var colors = {"red", "green", "blue"}"], answer: 1 }
-    ];
-
-    let currentQuestion = 0;
-    let score = 0;
-    let shuffledQuestions = quizData.sort(() => 0.5 - Math.random());
-
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const feedbackEl = document.getElementById("feedback");
-    const nextBtn = document.getElementById("nextBtn");
-    const resultEl = document.getElementById("result");
-    const scoreEl = document.getElementById("score");
-
-    function goFullScreen() {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-      }
-    }
-
-    function loadQuestion() {
-      feedbackEl.textContent = "";
-      const current = shuffledQuestions[currentQuestion];
-      questionEl.textContent = current.question;
-      optionsEl.innerHTML = "";
-      current.options.forEach((option, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = option;
-        btn.addEventListener("click", () => checkAnswer(index));
-        optionsEl.appendChild(btn);
-      });
-    }
-
-    function checkAnswer(selected) {
-      const correct = shuffledQuestions[currentQuestion].answer;
-      if (selected === correct) {
-        score++;
-        feedbackEl.textContent = "Correct Answer 🥳🥳🥳 YAAAAY!";
-        feedbackEl.style.color = "green";
-      } else {
-        feedbackEl.textContent = `Oops! Correct answer is: ${shuffledQuestions[currentQuestion].options[correct]}`;
-        feedbackEl.style.color = "red";
-      }
-      nextBtn.style.display = "block";
-    }
-
-    nextBtn.addEventListener("click", () => {
-      currentQuestion++;
-      nextBtn.style.display = "none";
-      if (currentQuestion < shuffledQuestions.length) {
-        loadQuestion();
-      } else {
-        showResult();
-      }
-    });
-
-    function showResult() {
-      document.getElementById("quiz").classList.add("hidden");
-      resultEl.classList.remove("hidden");
-      scoreEl.textContent = `${score} / ${shuffledQuestions.length}`;
-    }
-
-    goFullScreen();
-    loadQuestion();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
