@@ -1,216 +1,225 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Fira Code', 'Courier New', monospace;
-  background: #121212 url('https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
-  background-size: cover;
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-  color: #e0e0e0;
-  position: relative;
-  overflow: hidden;
-}
-
-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 0;
-}
-
-.quiz-container {
-  background: rgba(30, 30, 30, 0.9);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  max-width: 700px;
-  width: 90%;
-  position: relative;
-  z-index: 1;
-  border: 1px solid #444;
-  backdrop-filter: blur(5px);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #4CAF50;
-  font-size: 2.2rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-#question {
-  font-size: 1.4rem;
-  margin-bottom: 1.5rem;
-  color: #f5f5f5;
-  line-height: 1.5;
-  background: rgba(40, 40, 40, 0.7);
-  padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid #4CAF50;
-}
-
-#options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-#options button {
-  padding: 1rem;
-  background: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #444;
-  border-radius: 8px;
-  transition: all 0.3s;
-  cursor: pointer;
-  font-family: 'Fira Code', monospace;
-  font-size: 1rem;
-  text-align: left;
-}
-
-#options button:hover {
-  background: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#options button:active {
-  transform: translateY(0);
-}
-
-#nextBtn, #playAgainBtn {
-  margin-top: 1.5rem;
-  width: 100%;
-  padding: 1rem;
-  font-size: 1.1rem;
-  border: none;
-  background: #4CAF50;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
-}
-
-#nextBtn:hover, #playAgainBtn:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#nextBtn {
-  display: none;
-}
-
-.hidden {
-  display: none;
-}
-
-#feedback {
-  font-weight: bold;
-  margin-top: 1rem;
-  font-size: 1.2rem;
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: center;
-  animation: fadeIn 0.5s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.correct {
-  color: #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
-  border: 1px solid #4CAF50;
-}
-
-.incorrect {
-  color: #f44336;
-  background: rgba(244, 67, 54, 0.1);
-  border: 1px solid #f44336;
-}
-
-.fruit {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  z-index: 2;
-  animation: fall linear forwards;
-  pointer-events: none;
-  font-size: 30px;
-}
-
-@keyframes fall {
-  to {
-    transform: translateY(calc(100vh + 50px));
+// Quiz data
+const quizData = [
+  { 
+    question: "What does HTML stand for?", 
+    options: ["Hyper Text Markup Language", "Hot Mail", "How To Make Landingpage", "Hyperlinks and Text Markup Language"], 
+    answer: 0,
+    funFact: "HTML was created by Tim Berners-Lee in 1991!"
+  },
+  { 
+    question: "What does CSS stand for?", 
+    options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style Syntax", "Colorful Style Structure"], 
+    answer: 1,
+    funFact: "CSS was first proposed by Håkon Wium Lie in 1994 while working with Tim Berners-Lee at CERN."
+  },
+  { 
+    question: "Inside which HTML element do we put JavaScript?", 
+    options: ["<js>", "<scripting>", "<script>", "<javascript>"], 
+    answer: 2,
+    funFact: "The <script> tag can load both internal and external JavaScript files."
+  },
+  { 
+    question: "Which language runs in a web browser?", 
+    options: ["Java", "C", "Python", "JavaScript"], 
+    answer: 3,
+    funFact: "JavaScript was created in just 10 days by Brendan Eich in 1995!"
+  },
+  { 
+    question: "What year was JavaScript launched?", 
+    options: ["1996", "1995", "1994", "None of the above"], 
+    answer: 1,
+    funFact: "JavaScript was originally named Mocha, then LiveScript, before finally being named JavaScript."
   }
+];
+
+// Game state variables
+let currentQuestion = 0;
+let score = 0;
+let shuffledQuestions = [];
+const fruits = ['🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍑', '🥭'];
+
+// DOM elements
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const feedbackEl = document.getElementById("feedback");
+const nextBtn = document.getElementById("nextBtn");
+const resultEl = document.getElementById("result");
+const scoreEl = document.getElementById("score");
+const currentScoreEl = document.getElementById("currentScore");
+const totalQuestionsEl = document.getElementById("totalQuestions");
+const finalCommentEl = document.getElementById("finalComment");
+const playAgainBtn = document.getElementById("playAgainBtn");
+
+// Initialize the game
+function initGame() {
+  // Shuffle questions
+  shuffledQuestions = [...quizData].sort(() => Math.random() - 0.5);
+  
+  // Reset game state
+  currentQuestion = 0;
+  score = 0;
+  currentScoreEl.textContent = score;
+  totalQuestionsEl.textContent = shuffledQuestions.length;
+  
+  // Show quiz and hide result
+  document.getElementById("quiz").classList.remove("hidden");
+  resultEl.classList.add("hidden");
+  
+  // Load first question
+  loadQuestion();
+  
+  // Try to enter fullscreen
+  enterFullscreen();
 }
 
-.score-display {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 1rem;
-  z-index: 10;
+// Load current question
+function loadQuestion() {
+  feedbackEl.textContent = "";
+  feedbackEl.className = "";
+  
+  const current = shuffledQuestions[currentQuestion];
+  questionEl.textContent = `${currentQuestion + 1}. ${current.question}`;
+  optionsEl.innerHTML = "";
+  
+  // Shuffle options while keeping track of correct answer
+  const optionsWithIndex = current.options.map((option, index) => ({ option, originalIndex: index }));
+  const shuffledOptions = [...optionsWithIndex].sort(() => Math.random() - 0.5);
+  let correctIndex = shuffledOptions.findIndex(opt => opt.originalIndex === current.answer);
+  
+  // Create option buttons
+  shuffledOptions.forEach((option, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = option.option;
+    btn.addEventListener("click", () => checkAnswer(index, correctIndex));
+    optionsEl.appendChild(btn);
+  });
 }
 
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #f00;
-  border-radius: 50%;
-  animation: confetti-fall 3s linear forwards;
-  pointer-events: none;
-}
-
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  #options {
-    grid-template-columns: 1fr;
+// Check selected answer
+function checkAnswer(selectedIndex, correctIndex) {
+  const allButtons = optionsEl.querySelectorAll("button");
+  
+  // Disable all buttons
+  allButtons.forEach(btn => {
+    btn.disabled = true;
+  });
+  
+  if (selectedIndex === correctIndex) {
+    // Correct answer
+    score++;
+    currentScoreEl.textContent = score;
+    feedbackEl.textContent = `🎉 CORRECT! 🎉\n${shuffledQuestions[currentQuestion].funFact}`;
+    feedbackEl.className = "correct";
+    allButtons[selectedIndex].style.background = "#4CAF50";
+    
+    // Celebration effects
+    createFallingFruits();
+    createConfetti();
+  } else {
+    // Wrong answer
+    feedbackEl.textContent = `❌ Incorrect! The correct answer was:\n${shuffledQuestions[currentQuestion].options[shuffledQuestions[currentQuestion].answer]}\n\n${shuffledQuestions[currentQuestion].funFact}`;
+    feedbackEl.className = "incorrect";
+    allButtons[selectedIndex].style.background = "#f44336";
+    allButtons[correctIndex].style.background = "#4CAF50";
   }
   
-  .quiz-container {
-    width: 95%;
-    padding: 1.5rem;
-  }
-  
-  h1 {
-    font-size: 1.8rem;
-  }
-  
-  #question {
-    font-size: 1.2rem;
+  // Show next button
+  nextBtn.style.display = "block";
+}
+
+// Create falling fruits animation
+function createFallingFruits() {
+  for (let i = 0; i < 8; i++) {
+    const fruit = document.createElement("div");
+    fruit.className = "fruit";
+    fruit.textContent = fruits[Math.floor(Math.random() * fruits.length)];
+    fruit.style.left = `${Math.random() * 100}vw`;
+    fruit.style.top = "-50px";
+    fruit.style.animationDuration = `${Math.random() * 2 + 1.5}s`;
+    document.body.appendChild(fruit);
+    
+    // Remove after animation
+    setTimeout(() => fruit.remove(), 3000);
   }
 }
+
+// Create confetti animation
+function createConfetti() {
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', 
+                 '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', 
+                 '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800'];
+  
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.style.left = `${Math.random() * 100}vw`;
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = `${Math.random() * 8 + 4}px`;
+    confetti.style.height = confetti.style.width;
+    confetti.style.animationDuration = `${Math.random() * 2 + 1}s`;
+    document.body.appendChild(confetti);
+    
+    // Remove after animation
+    setTimeout(() => confetti.remove(), 3000);
+  }
+}
+
+// Show final results
+function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+  resultEl.classList.remove("hidden");
+  scoreEl.textContent = score;
+  totalQuestionsEl.textContent = shuffledQuestions.length;
+  
+  // Final comment based on score
+  const percentage = (score / shuffledQuestions.length) * 100;
+  if (percentage >= 90) {
+    finalCommentEl.textContent = "🏆 Coding Master! You're amazing! 🏆";
+    createConfetti();
+    createFallingFruits();
+  } else if (percentage >= 70) {
+    finalCommentEl.textContent = "🌟 Great job! You know your stuff! 🌟";
+    createConfetti();
+  } else if (percentage >= 50) {
+    finalCommentEl.textContent = "👍 Good effort! Keep learning! 👍";
+  } else {
+    finalCommentEl.textContent = "💡 Keep practicing! Every coder starts somewhere! 💡";
+  }
+}
+
+// Fullscreen handling
+function enterFullscreen() {
+  try {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log("Fullscreen error:", err);
+      });
+    }
+  } catch (e) {
+    console.log("Fullscreen not supported:", e);
+  }
+}
+
+// Event listeners
+nextBtn.addEventListener("click", () => {
+  currentQuestion++;
+  nextBtn.style.display = "none";
+  
+  if (currentQuestion < shuffledQuestions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+
+playAgainBtn.addEventListener("click", initGame);
+
+// Initialize the game when page loads
+window.addEventListener('DOMContentLoaded', initGame);
+
+// Re-enter fullscreen if user exits it
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    setTimeout(enterFullscreen, 1000);
+  }
+});
