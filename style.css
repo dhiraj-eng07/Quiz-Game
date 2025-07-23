@@ -1,250 +1,247 @@
-const quizData = [
-  { 
-    question: "What does HTML stand for?", 
-    options: ["Hyper Text Markup Language", "Hot Mail", "How To Make Landingpage", "Hyperlinks and Text Markup Language"], 
-    answer: 0,
-    funFact: "HTML was created by Tim Berners-Lee in 1991!"
-  },
-  { 
-    question: "What does CSS stand for?", 
-    options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style Syntax", "Colorful Style Structure"], 
-    answer: 1,
-    funFact: "CSS was first proposed by Håkon Wium Lie in 1994 while working with Tim Berners-Lee at CERN."
-  },
-  { 
-    question: "Inside which HTML element do we put JavaScript?", 
-    options: ["<js>", "<scripting>", "<script>", "<javascript>"], 
-    answer: 2,
-    funFact: "The <script> tag can load both internal and external JavaScript files."
-  },
-  { 
-    question: "Which language runs in a web browser?", 
-    options: ["Java", "C", "Python", "JavaScript"], 
-    answer: 3,
-    funFact: "JavaScript was created in just 10 days by Brendan Eich in 1995!"
-  },
-  { 
-    question: "What year was JavaScript launched?", 
-    options: ["1996", "1995", "1994", "None of the above"], 
-    answer: 1,
-    funFact: "JavaScript was originally named Mocha, then LiveScript, before finally being named JavaScript."
-  },
-  { 
-    question: "What does SQL stand for?", 
-    options: ["Stylish Question Language", "Stylesheet Query Language", "Structured Query Language", "Statement Query Level"], 
-    answer: 2,
-    funFact: "SQL was developed at IBM in the 1970s and became a standard in 1986."
-  },
-  { 
-    question: "Which company developed the React library?", 
-    options: ["Google", "Microsoft", "Facebook", "Apple"], 
-    answer: 2,
-    funFact: "React was first deployed on Facebook's News Feed in 2011 and later on Instagram in 2012."
-  },
-  { 
-    question: "What does API stand for?", 
-    options: ["Application Programming Interface", "Apple Programming Interface", "Application Processing Integration", "Application Program Interaction"], 
-    answer: 0,
-    funFact: "APIs allow different software systems to communicate with each other, like waiters between customers and kitchen."
-  },
-  { 
-    question: "Which is not a programming language?", 
-    options: ["HTML", "Python", "Java", "C++"], 
-    answer: 0,
-    funFact: "HTML is a markup language, not a programming language, as it doesn't have logic capabilities."
-  },
-  { 
-    question: "Which CSS property controls the text size?", 
-    options: ["font-style", "text-size", "font-size", "text-style"], 
-    answer: 2,
-    funFact: "CSS font-size can be specified in px, em, rem, %, and other units!"
-  }
-];
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-let currentQuestion = 0;
-let score = 0;
-let shuffledQuestions = [];
-const fruits = ['🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍑', '🥭'];
+body {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  background: #121212 url('https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  color: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
 
-const questionEl = document.getElementById("question");
-const optionsEl = document.getElementById("options");
-const feedbackEl = document.getElementById("feedback");
-const nextBtn = document.getElementById("nextBtn");
-const resultEl = document.getElementById("result");
-const scoreEl = document.getElementById("score");
-const currentScoreEl = document.getElementById("currentScore");
-const totalQuestionsEl = document.getElementById("totalQuestions");
-const finalCommentEl = document.getElementById("finalComment");
-const playAgainBtn = document.getElementById("playAgainBtn");
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 0;
+}
 
-function goFullScreen() {
-  try {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(err => {
-        console.log("Fullscreen error:", err);
-      });
-    }
-  } catch (e) {
-    console.log("Fullscreen not supported:", e);
+/* Quiz container styles */
+.quiz-container {
+  background: rgba(30, 30, 30, 0.9);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  max-width: 700px;
+  width: 90%;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #444;
+  backdrop-filter: blur(5px);
+  margin: 1rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #4CAF50;
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Question and options styling */
+#question {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #f5f5f5;
+  line-height: 1.5;
+  background: rgba(40, 40, 40, 0.7);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #4CAF50;
+}
+
+#options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+#options button {
+  padding: 0.9rem;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 8px;
+  transition: all 0.3s;
+  cursor: pointer;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  text-align: left;
+}
+
+#options button:hover:not(:disabled) {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#options button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Button styles */
+#nextBtn, #playAgainBtn {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+#nextBtn:hover, #playAgainBtn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#nextBtn {
+  display: none;
+}
+
+/* Feedback and result styles */
+#feedback {
+  font-weight: bold;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.correct {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid #4CAF50;
+}
+
+.incorrect {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid #f44336;
+}
+
+/* Score display */
+.score-display {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+/* Animation elements */
+.fruit {
+  position: fixed;
+  font-size: 28px;
+  z-index: 2;
+  animation: fall linear forwards;
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
   }
 }
 
-function startGame() {
-  shuffledQuestions = [...quizData].sort(() => 0.5 - Math.random());
-  currentQuestion = 0;
-  score = 0;
-  currentScoreEl.textContent = score;
-  totalQuestionsEl.textContent = shuffledQuestions.length;
-  document.getElementById("quiz").classList.remove("hidden");
-  resultEl.classList.add("hidden");
-  goFullScreen();
-  loadQuestion();
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #f00;
+  border-radius: 50%;
+  animation: confetti-fall 3s linear forwards;
+  pointer-events: none;
 }
 
-function loadQuestion() {
-  feedbackEl.textContent = "";
-  feedbackEl.className = "";
-  const current = shuffledQuestions[currentQuestion];
-  questionEl.textContent = `${currentQuestion + 1}. ${current.question}`;
-  optionsEl.innerHTML = "";
-  
-  // Shuffle options while keeping track of correct answer
-  const optionsWithIndex = current.options.map((option, index) => ({ option, originalIndex: index }));
-  const shuffledOptions = optionsWithIndex.sort(() => 0.5 - Math.random());
-  let newCorrectIndex = -1;
-  
-  shuffledOptions.forEach((item, newIndex) => {
-    if (item.originalIndex === current.answer) {
-      newCorrectIndex = newIndex;
-    }
-    const btn = document.createElement("button");
-    btn.textContent = item.option;
-    btn.dataset.originalIndex = item.originalIndex;
-    btn.addEventListener("click", () => checkAnswer(newIndex, newCorrectIndex));
-    optionsEl.appendChild(btn);
-  });
-}
-
-function checkAnswer(selected, correctIndex) {
-  const allButtons = optionsEl.querySelectorAll("button");
-  
-  // Disable all buttons after selection
-  allButtons.forEach(btn => {
-    btn.disabled = true;
-    btn.style.opacity = "0.7";
-  });
-  
-  if (selected === correctIndex) {
-    score++;
-    currentScoreEl.textContent = score;
-    feedbackEl.textContent = `🎉 YAAAAAY! CORRECT ANSWER! 🎉\n\n${shuffledQuestions[currentQuestion].funFact || "Great job!"}`;
-    feedbackEl.className = "correct";
-    
-    // Add celebration effects
-    createFallingFruits();
-    createConfetti();
-    
-    // Highlight correct answer
-    allButtons[selected].style.background = "#4CAF50";
-    allButtons[selected].style.color = "white";
-    allButtons[selected].style.border = "2px solid #45a049";
-    allButtons[selected].style.transform = "scale(1.05)";
-  } else {
-    feedbackEl.textContent = `❌ Oops! The correct answer was: ${shuffledQuestions[currentQuestion].options[shuffledQuestions[currentQuestion].answer]}\n\n${shuffledQuestions[currentQuestion].funFact || "Better luck next time!"}`;
-    feedbackEl.className = "incorrect";
-    
-    // Highlight wrong and correct answers
-    allButtons[selected].style.background = "#f44336";
-    allButtons[selected].style.color = "white";
-    allButtons[selected].style.border = "2px solid #d32f2f";
-    
-    allButtons[correctIndex].style.background = "#4CAF50";
-    allButtons[correctIndex].style.color = "white";
-    allButtons[correctIndex].style.border = "2px solid #45a049";
-    allButtons[correctIndex].style.transform = "scale(1.05)";
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
   }
-  
-  nextBtn.style.display = "block";
-}
-
-function createFallingFruits() {
-  for (let i = 0; i < 10; i++) {
-    const fruit = document.createElement("div");
-    fruit.className = "fruit";
-    fruit.textContent = fruits[Math.floor(Math.random() * fruits.length)];
-    fruit.style.left = `${Math.random() * 100}vw`;
-    fruit.style.top = "-50px";
-    fruit.style.fontSize = `${Math.random() * 20 + 20}px`;
-    fruit.style.animationDuration = `${Math.random() * 3 + 2}s`;
-    document.body.appendChild(fruit);
-    
-    // Remove fruit after animation
-    setTimeout(() => {
-      fruit.remove();
-    }, 5000);
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
   }
 }
 
-function createConfetti() {
-  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  #options {
+    grid-template-columns: 1fr 1fr;
+  }
   
-  for (let i = 0; i < 50; i++) {
-    const confetti = document.createElement("div");
-    confetti.className = "confetti";
-    confetti.style.left = `${Math.random() * 100}vw`;
-    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    confetti.style.width = `${Math.random() * 10 + 5}px`;
-    confetti.style.height = `${Math.random() * 10 + 5}px`;
-    confetti.style.animationDuration = `${Math.random() * 2 + 1}s`;
-    document.body.appendChild(confetti);
-    
-    // Remove confetti after animation
-    setTimeout(() => {
-      confetti.remove();
-    }, 3000);
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  #question {
+    font-size: 1.4rem;
   }
 }
 
-nextBtn.addEventListener("click", () => {
-  currentQuestion++;
-  nextBtn.style.display = "none";
-  if (currentQuestion < shuffledQuestions.length) {
-    loadQuestion();
-  } else {
-    showResult();
-  }
-});
-
-function showResult() {
-  document.getElementById("quiz").classList.add("hidden");
-  resultEl.classList.remove("hidden");
-  scoreEl.textContent = score;
-  totalQuestionsEl.textContent = shuffledQuestions.length;
-  
-  // Add final comment based on score
-  const percentage = (score / shuffledQuestions.length) * 100;
-  if (percentage >= 90) {
-    finalCommentEl.textContent = "🏆 Coding Master! You're amazing! 🏆";
-    createConfetti();
-    createFallingFruits();
-  } else if (percentage >= 70) {
-    finalCommentEl.textContent = "🌟 Great job! You know your stuff! 🌟";
-    createConfetti();
-  } else if (percentage >= 50) {
-    finalCommentEl.textContent = "👍 Good effort! Keep learning! 👍";
-  } else {
-    finalCommentEl.textContent = "💡 Keep practicing! Every coder starts somewhere! 💡";
-  }
+.hidden {
+  display: none;
 }
 
-playAgainBtn.addEventListener("click", startGame);
+#result {
+  text-align: center;
+}
 
-// Initialize game
-startGame();
+#result h2 {
+  margin-bottom: 1rem;
+  color: #4CAF50;
+}
 
-// Allow exiting fullscreen with ESC
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement) {
-    goFullScreen();
-  }
-});
+#score {
+  font-size: 1.8rem;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+#finalComment {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  color: #f5f5f5;
+}
+
+#playAgainBtn {
+  background: #2196F3;
+}
+
+#playAgainBtn:hover {
+  background: #0b7dda;
+}
